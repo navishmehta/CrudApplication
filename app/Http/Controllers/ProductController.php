@@ -13,7 +13,7 @@ class ProductController extends Controller
     //This function will show products page
     public function index()
     {
-        $products = Product::orderBy('created_at', 'DESC')->get();
+        $products = Product::query()->latest()->get();
         return view("products.list", ["products" => $products]);
     }
 
@@ -23,109 +23,86 @@ class ProductController extends Controller
         return view("products.create");
     }
 
-    //This function will store a product in db
     public function store(Request $request)
     {
-        $rules = [
+        $request->validate([
             "name" => "required | min:5",
             "sku" => "required | min:3",
             "price" => "required | numeric",
+            'description' => ['nullable', 'string'],
+            'image' => ['sometimes', 'nullable', 'image']
+        ]);
+
+        $data = [
+            'name' => $request->name,
+            'sku' => $request->sku,
+            'price' => $request->price,
+            'description' => $request->description,
         ];
 
-        if ($request->image != "") {
-            $rules['image'] = 'image';
-        }
-
-        $validator = Validator::make($request->all(), $rules);
-        if ($validator->fails()) {
-            return redirect()->route('products.create')->withErrors($validator)->withInput();
-        }
-
-        //here we will insert product in db
-        $product = new Product();
-        $product->name = $request->name;
-        $product->sku = $request->sku;
-        $product->price = $request->price;
-        $product->description = $request->description;
-        $product->save();
-
-        if ($request->image != "") {
-            //here we will store image
-            $image = $request->image;
+        if ($request->hasFile('image')) {
+            $image = $request->file('image');
             $ext = $image->getClientOriginalExtension();
-            $imageName = time() . "." . $ext;   //unique image name
+            $imageName = time() . "." . $ext;
 
-            //Save image to products directory
             $image->move(public_path('uploads/products'), $imageName);
 
-            //Save image in db
-            $product->image = $imageName;
-            $product->save();
+            $data['image'] = $imageName;
         }
+
+        Product::query()->create($data);
 
         return redirect()->route('products.list')->with('success', 'Product added successfully.');
     }
 
     //This function will show edit products page
-    public function edit($id)
+    public function edit(Product $product)
     {
-        $product = Product::findOrFail($id);        
         return view('products.edit', ['product' => $product]);
     }
 
     //This function will update a product
-    public function update($id, Request $request)
+    public function update(Product $product, Request $request)
     {
-
-        $product = Product::findOrFail($id);
-
-        $rules = [
+        $request->validate([
             "name" => "required | min:5",
             "sku" => "required | min:3",
             "price" => "required | numeric",
+            'description' => ['nullable', 'string'],
+            'image' => ['sometimes', 'nullable', 'image']
+        ]);
+
+        $data = [
+            'name' => $request->name,
+            'sku' => $request->sku,
+            'price' => $request->price,
+            'description' => $request->description,
         ];
 
-        if ($request->image != "") {
-            $rules['image'] = 'image';
-        }
-
-        $validator = Validator::make($request->all(), $rules);
-        if ($validator->fails()) {
-            return redirect()->route('products.edit', $product->id)->withErrors($validator)->withInput();
-        }
-
-        //here we will update product in db        
-        $product->name = $request->name;
-        $product->sku = $request->sku;
-        $product->price = $request->price;
-        $product->description = $request->description;
-        $product->save();
-
-        if ($request->image != "") {
+        if ($request->hasFile('image')) {
 
             //delete old image
             File::delete(public_path("uploads/products" . $product->image));
 
             //here we will store image
-            $image = $request->image;
+            $image = $request->file('image');
             $ext = $image->getClientOriginalExtension();
             $imageName = time() . "." . $ext;   //unique image name
 
             //Save image to products directory
             $image->move(public_path('uploads/products'), $imageName);
 
-            //Save image in db
-            $product->image = $imageName;
+            $data['image'] = $imageName;
         }
+
+        $product->update($data);
 
         return redirect()->route('products.list')->with('success', 'Product updated successfully.');
     }
 
     //This function will delete a product
-    public function destroy($id)
+    public function destroy(Product $product)
     {
-        $product = Product::findOrFail($id);
-
         //delete image
         File::delete(public_path("uploads/products" . $product->image));
 
