@@ -4,9 +4,12 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\ProductController;
 
 Route::get('/', function () {
-    return view('welcome');
-});
+    return view('login');
+})->name('products.login');
 
+Route::get('/signup', function () {
+    return view('signup');
+})->name("products.signup");
 
 Route::controller(ProductController::class)->group(function(){
     Route::get('/products/create','create')->name('products.create');

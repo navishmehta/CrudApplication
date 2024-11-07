@@ -1,9 +1,12 @@
 @extends('layouts.app')
 
+{{-- style="display: flex; justify-content: space-between "  --}}
 @section('content')
-  <div class="flex justify-end w-6/12 mx-auto">
-    <a href="{{ route('products.create') }}"
-      class="px-4 py-2 font-semibold text-white bg-black rounded-md w-fit hover:bg-gray-700">Create</a>
+  <div class="flex flex-row justify-between w-6/12 mx-auto">
+    <a href="{{ route('products.create') }}" 
+    class="px-4 py-2 font-semibold text-white w-fit bg-black rounded-md  hover:bg-gray-700">Create</a>
+    <a href="{{ route('products.logout') }}" 
+    class="px-4 py-2 font-semibold text-white w-fit bg-black rounded-md hover:bg-gray-700">Logout</a>
   </div>
   <div class="flex flex-col justify-center w-6/12 mx-auto rounded-md shadow-lg">
     <div class="px-4 py-4 text-xl font-bold text-white bg-black">Products</div>

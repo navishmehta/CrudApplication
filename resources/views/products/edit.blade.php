@@ -1,9 +1,11 @@
 @extends('layouts.app')
 
 @section('content')
-  <div class="flex justify-end w-6/12 mx-auto">
+  <div class="flex flex-row justify-between w-6/12 mx-auto">
     <a href="{{ route('products.list') }}"
       class="px-4 py-2 font-semibold text-white bg-black rounded-md w-fit hover:bg-gray-700">Back</a>
+      <a href="{{ route('products.logout') }}"
+      class="px-4 py-2 font-semibold text-white bg-black rounded-md w-fit hover:bg-gray-700">Logout</a>
   </div>
   <form enctype="multipart/form-data" action="{{ route('products.update', $product->id) }}" method="post">
     @method('put')

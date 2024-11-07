@@ -2,10 +2,11 @@
 
 namespace App\Http\Controllers;
 
-use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Validator;
-use Illuminate\Support\Facades\File;
 use App\Models\Product;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\File;
+use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Facades\Validator;
 
 
 class ProductController extends Controller
@@ -102,9 +103,14 @@ class ProductController extends Controller
 
     //This function will delete a product
     public function destroy(Product $product)
-    {
-        //delete image
-        File::delete(public_path("uploads/products" . $product->image));
+    {               
+        // dd($filePath);
+        // Storage::delete($filePath);
+        
+        
+        // $imagePath = Product::select('image')->where('id', $product->id)->get();
+        $filePath = public_path() . '/uploads/products/' . $product->image;
+        unlink($filePath);
 
         //delete product from db
         $product->delete();
